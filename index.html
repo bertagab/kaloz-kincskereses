@@ -3,36 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Kalóz Kincskeresés - Szentendre</title>
+  <title>Kacsakő Kalóz Kincskeresés - Szentendre</title>
   
   <!-- Tailwind CSS & MapLibre GL CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
   
-  <!-- React & MapLibre JS (megbízható CDN workerrel) -->
+  <!-- React & MapLibre JS CDN -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
+    * { -webkit-tap-highlight-color: transparent; }
     body, html, #root {
       width: 100%;
       height: 100%;
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
       background-color: #1e1208;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
+      color: #2b1a0e;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+    }
+    .pergamen-bg {
+      background-color: #f5e6c8;
+      background-image: radial-gradient(#d4a574 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+    .parchment-border {
+      border: 3px solid #8b5a2b;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 50px rgba(139,90,43,0.15);
     }
     .maplibregl-popup-content {
       background: #fdf6e2 !important;
       color: #2b1a0e !important;
       border: 2px solid #8b5a2b !important;
-      border-radius: 12px !important;
-      padding: 10px 14px !important;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+      border-radius: 14px !important;
+      padding: 12px 14px !important;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
     }
     .maplibregl-popup-tip {
       border-top-color: #8b5a2b !important;
@@ -45,39 +55,50 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
-    // Szentendre Kacsakő és Duna-parti állomások
     const STATIONS = [
       {
         id: 1,
-        title: "1. Állomás: Kacsakő Bisztró",
-        coords: [19.0792, 47.6645],
-        task: "Itt kezdődik a kaland! Keresd meg a vén kalózok találkozóhelyét a part mentén.",
-        clue: "Ahol a kavicsok táncolnak a Duna vizén...",
-        code: "KACSA"
+        title: "1. Kacsakő Bisztró – A Kalózbázis",
+        coords: [19.07925, 47.66448],
+        subtitle: "A kaland kezdete",
+        story: "Üdvözlet a Duna rettegett kalózai között! A kincsesláda kulcsa darabokra tört a part mentén. Keresd meg a vízparti kövek közt az első jelet!",
+        task: "Hány nagy fűzfa vigyázza a vízpartot a Kacsakő teraszának közvetlen közelében?",
+        hint: "Nézz a víz felé a kavicsos partszakaszon!",
+        solution: "3",
+        badge: "⚓ Kalózjelölt"
       },
       {
         id: 2,
-        title: "2. Állomás: A Duna Hullámai",
-        coords: [19.0783, 47.6668],
-        task: "Figyeld a folyó sodrását! Találd meg a következő nyomot a part menti padok közelében.",
-        clue: "Nézz a fűzfák árnyékába!",
-        code: "HULLAM"
+        title: "2. A Régi Gályakikötő",
+        coords: [19.07820, 47.66690],
+        subtitle: "Titkos kikötő a sodrásban",
+        story: "A dunai hullámok itt sodorták partra a vén Feketeszakáll hordóját. A kikötőbóják és parti kövek között újabb rejtvény lapul.",
+        task: "Keresd meg a kékre festett kikötővasat a sétány mentén! Mi a rávésett szám?",
+        hint: "A bicikliút és a sétány találkozásánál nézelődj.",
+        solution: "7",
+        badge: "🧭 Kormányos"
       },
       {
         id: 3,
-        title: "3. Állomás: A Kalóz Kikötő",
-        coords: [19.0772, 47.6695],
-        task: "Egy régi hajóorr körvonalai sejlenek fel. Keresd meg a titkos jelet!",
-        clue: "Ahol a part kövei a legmeredekebbek.",
-        code: "KIKOTO"
+        title: "3. A Sárkányos Sziklák",
+        coords: [19.07680, 47.66980],
+        subtitle: "Veszélyes zátonyok",
+        story: "Itt a víz alatti kövek úgy néznek ki, mint egy alvó folyami szörny hátuszonya. Csak a legbátrabb tengerészek léphetnek át rajtuk!",
+        task: "Hány lépés választja el a parti sziklatömböt a sétány lépcsőjétől?",
+        hint: "Számold meg a nagy lépéseket a partra levezető rézsűn!",
+        solution: "12",
+        badge: "⚔️ Elsőtiszt"
       },
       {
         id: 4,
-        title: "4. Állomás: Az Arany Kincsesláda",
-        coords: [19.0758, 47.6718],
-        task: "Elértétek a végső helyszínt! Az aranyrögök a homok és fák rejtekében várnak.",
-        clue: "Ássatok a kincsesláda közelében!",
-        code: "KINCSEK"
+        title: "4. A Rejtett Kincsesláda",
+        coords: [19.07540, 47.67210],
+        subtitle: "Az Aranyrögök Lelenchelysége",
+        story: "Megérkeztetek a titkos rejtekhelyhez! A dunai aranyrögökkel teli kincsesláda már a közeletekben várja a legügyesebb kalózokat.",
+        task: "Írd be a végső kalóz jelszót a láda kinyitásához!",
+        hint: "A jelszó az, ami minden igazi kalóz szívét megdobogtatja: KINCS",
+        solution: "KINCS",
+        badge: "👑 Kalózkapitány"
       }
     ];
 
@@ -85,47 +106,50 @@
       const mapContainer = useRef(null);
       const mapInstance = useRef(null);
       const markersRef = useRef([]);
-      const [currentStation, setCurrentStation] = useState(0);
-      const [solved, setSolved] = useState([]);
-      const [inputCode, setInputCode] = useState("");
-      const [feedback, setFeedback] = useState("");
-      const [showChest, setShowChest] = useState(false);
+      
+      const [currentIdx, setCurrentIdx] = useState(0);
+      const [solvedStations, setSolvedStations] = useState([]);
+      const [inputVal, setInputVal] = useState("");
+      const [msg, setMsg] = useState({ text: "", type: "" });
+      const [showChestModal, setShowChestModal] = useState(false);
+      const [activeTab, setActiveTab] = useState("map"); // "map" vagy "list"
+
+      const station = STATIONS[currentIdx];
 
       useEffect(() => {
         if (!mapContainer.current) return;
 
-        // MapLibre inicializálása megbízható, kulcs nélküli vektoros/raszteres stílussal
+        // Vektoros / Carto Positron térképcsempe réteg (megbízható, ingyenes, nincs API kulcs limit)
         const map = new maplibregl.Map({
           container: mapContainer.current,
           style: {
             version: 8,
             sources: {
-              'osm-tiles': {
+              'carto-voyager': {
                 type: 'raster',
                 tiles: [
-                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                  'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png'
                 ],
                 tileSize: 256,
-                attribution: '&copy; OpenStreetMap közösség'
+                attribution: '&copy; CartoDB &copy; OpenStreetMap'
               }
             },
             layers: [
               {
-                id: 'osm-tiles-layer',
+                id: 'carto-voyager-layer',
                 type: 'raster',
-                source: 'osm-tiles',
+                source: 'carto-voyager',
                 minzoom: 0,
                 maxzoom: 19
               }
             ]
           },
-          center: [19.0780, 47.6670],
+          center: [19.0782, 47.6675],
           zoom: 15,
-          maxZoom: 18,
-          minZoom: 12
+          pitch: 20
         });
 
-        map.addControl(new maplibregl.NavigationControl(), 'top-right');
+        map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
         map.addControl(new maplibregl.GeolocateControl({
           positionOptions: { enableHighAccuracy: true },
           trackUserLocation: true
@@ -133,41 +157,45 @@
 
         map.on('load', () => {
           mapInstance.current = map;
-          updateMarkers(0, []);
+          renderMarkers(0, []);
         });
 
         return () => map.remove();
       }, []);
 
-      const updateMarkers = (stationIdx, solvedArr) => {
+      const renderMarkers = (activeI, solvedArr) => {
         const map = mapInstance.current;
         if (!map) return;
 
-        // Korábbi markerek eltávolítása
         markersRef.current.forEach(m => m.remove());
         markersRef.current = [];
 
-        STATIONS.forEach((s, idx) => {
-          const isCurrent = idx === stationIdx;
-          const isDone = solvedArr.includes(s.id);
+        STATIONS.forEach((st, idx) => {
+          const isDone = solvedArr.includes(st.id);
+          const isCurr = idx === activeI;
 
           const el = document.createElement('div');
-          el.className = 'flex items-center justify-center rounded-full shadow-lg font-bold border-2 transition-transform';
-          el.style.width = isCurrent ? '38px' : '28px';
-          el.style.height = isCurrent ? '38px' : '28px';
-          el.style.backgroundColor = isDone ? '#10b981' : isCurrent ? '#f59e0b' : '#6b7280';
-          el.style.borderColor = '#ffffff';
-          el.style.color = '#ffffff';
-          el.style.fontSize = isCurrent ? '16px' : '12px';
-          el.innerText = isDone ? '✓' : idx + 1;
+          el.className = 'cursor-pointer flex items-center justify-center font-black rounded-full shadow-2xl transition-all duration-300';
+          el.style.width = isCurr ? '42px' : '32px';
+          el.style.height = isCurr ? '42px' : '32px';
+          el.style.backgroundColor = isDone ? '#059669' : isCurr ? '#d97706' : '#78350f';
+          el.style.border = isCurr ? '3px solid #fde68a' : '2px solid #fff';
+          el.style.color = '#fff';
+          el.style.fontSize = isCurr ? '16px' : '12px';
+          el.innerHTML = isDone ? '✓' : `☠️`;
 
-          const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`
-            <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">${s.title}</div>
-            <div style="font-size: 12px;">${s.task}</div>
+          el.onclick = () => {
+            setCurrentIdx(idx);
+            map.flyTo({ center: st.coords, zoom: 16 });
+          };
+
+          const popup = new maplibregl.Popup({ offset: 25, closeButton: false }).setHTML(`
+            <div style="font-weight: 800; font-size: 13px; color: #8b4513;">${st.title}</div>
+            <div style="font-size: 11px; margin-top: 4px; color: #451a03;">${st.subtitle}</div>
           `);
 
           const marker = new maplibregl.Marker({ element: el })
-            .setLngLat(s.coords)
+            .setLngLat(st.coords)
             .setPopup(popup)
             .addTo(map);
 
@@ -175,116 +203,157 @@
         });
       };
 
-      const handleCheckCode = () => {
-        const target = STATIONS[currentStation];
-        if (inputCode.trim().toUpperCase() === target.code) {
-          const newSolved = [...solved, target.id];
-          setSolved(newSolved);
-          setInputCode("");
-          setFeedback("🎉 Bravó, kalóz! Megtaláltad a titkos kódot!");
+      const handleSolve = (e) => {
+        e.preventDefault();
+        if (!inputVal.trim()) return;
 
-          if (currentStation + 1 < STATIONS.length) {
-            const nextIdx = currentStation + 1;
-            setCurrentStation(nextIdx);
-            updateMarkers(nextIdx, newSolved);
-            mapInstance.current?.flyTo({ center: STATIONS[nextIdx].coords, zoom: 16 });
+        const isCorrect = inputVal.trim().toUpperCase() === station.solution.toUpperCase();
+
+        if (isCorrect) {
+          const updated = [...new Set([...solvedStations, station.id])];
+          setSolvedStations(updated);
+          setInputVal("");
+          setMsg({ text: "🎉 Kitűnő találat, kalóz! Megfejtetted a feladványt!", type: "success" });
+
+          if (currentIdx + 1 < STATIONS.length) {
+            const nextI = currentIdx + 1;
+            setCurrentIdx(nextI);
+            renderMarkers(nextI, updated);
+            mapInstance.current?.flyTo({ center: STATIONS[nextI].coords, zoom: 16 });
           } else {
-            setShowChest(true);
-            updateMarkers(currentStation, newSolved);
+            setShowChestModal(true);
+            renderMarkers(currentIdx, updated);
           }
         } else {
-          setFeedback("❌ Nem jó kód! Keresd tovább a jeleket!");
+          setMsg({ text: "❌ Nem jó válasz! Olvasd el újra a nyomravezetőt!", type: "error" });
         }
       };
 
-      const station = STATIONS[currentStation];
-
       return (
         <div className="flex flex-col h-screen w-full bg-[#1e1208] text-[#f5e6c8]">
-          {/* Fejléc */}
-          <header className="p-3 bg-[#2b1a0e] border-b border-[#8b5a2b] shadow-md flex items-center justify-between z-10">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">🏴‍☠️</span>
+          {/* Felső Kalóz Fejléc */}
+          <header className="px-4 py-3 bg-[#2b1a0e] border-b-2 border-[#8b5a2b] shadow-xl flex items-center justify-between z-20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#8b4513] border-2 border-amber-300 flex items-center justify-center text-xl shadow-inner">
+                ⚓
+              </div>
               <div>
-                <h1 className="text-base sm:text-lg font-black tracking-wide text-amber-200">KÁCSAKŐ KINCSKERESŐ</h1>
-                <p className="text-[11px] text-amber-100/70">Szentendrei kalandok a Duna-parton</p>
+                <h1 className="text-sm sm:text-base font-black tracking-widest uppercase text-amber-200">
+                  Kalóz Kincskereső
+                </h1>
+                <p className="text-[10px] text-amber-100/60 font-medium">Szentendrei Kacsakő & Duna-part</p>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-xs font-bold text-amber-300">
-                {solved.length} / {STATIONS.length} Kész
-              </span>
+
+            {/* Aranyrög és Állomás-számláló */}
+            <div className="flex items-center gap-2">
+              <div className="bg-[#1a0f06] border border-amber-500/40 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-md">
+                <span className="text-amber-400 text-sm">🪙</span>
+                <span className="text-xs font-bold text-amber-200">
+                  {solvedStations.length} / {STATIONS.length}
+                </span>
+              </div>
             </div>
           </header>
 
-          {/* Térképnézet */}
-          <div className="relative flex-1 w-full">
+          {/* Fő tartalom: Térkép nézet */}
+          <div className="relative flex-1 w-full overflow-hidden">
             <div ref={mapContainer} className="w-full h-full" />
+
+            {/* Lebegő gombok a térképen */}
+            <div className="absolute top-3 left-3 z-10 flex gap-2">
+              <button
+                onClick={() => {
+                  mapInstance.current?.flyTo({ center: station.coords, zoom: 16 });
+                }}
+                className="bg-[#2b1a0e]/90 backdrop-blur border border-amber-400/50 text-amber-200 text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg active:scale-95 transition"
+              >
+                📍 Állomás fókusz
+              </button>
+            </div>
           </div>
 
-          {/* Alsó kártya: Feladat & Kódellenőrzés */}
-          <div className="p-4 bg-[#2b1a0e] border-t-2 border-[#8b5a2b] rounded-t-2xl shadow-2xl z-10 max-w-lg mx-auto w-full">
-            {!showChest ? (
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
-                    Állomás #{station.id}
-                  </span>
-                  <span className="text-xs bg-amber-900/60 px-2 py-0.5 rounded border border-amber-500/40 text-amber-200">
-                    Kódos feladvány
-                  </span>
-                </div>
-                <h2 className="text-lg font-bold text-white mb-1">{station.title}</h2>
-                <p className="text-xs sm:text-sm text-amber-100/90 mb-2">{station.task}</p>
-                <div className="bg-[#1a0f06]/80 p-2.5 rounded-lg border border-[#8b5a2b]/40 mb-3">
-                  <span className="text-xs font-bold text-amber-400 block mb-0.5">💡 Nyomravezető:</span>
-                  <p className="text-xs italic text-amber-200/90">{station.clue}</p>
-                </div>
-
-                {/* Kód megadása */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={inputCode}
-                    onChange={(e) => setInputCode(e.target.value)}
-                    placeholder="Állomás kódja..."
-                    className="flex-1 bg-[#1e1208] border border-amber-600/60 rounded-xl px-3 py-2 text-sm text-white placeholder-amber-200/40 focus:outline-none focus:border-amber-400"
-                  />
-                  <button
-                    onClick={handleCheckCode}
-                    className="bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-bold px-4 py-2 rounded-xl text-sm transition"
-                  >
-                    Nyitás
-                  </button>
-                </div>
-                {feedback && (
-                  <p className={`text-xs mt-2 font-medium ${feedback.startsWith('🎉') ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {feedback}
-                  </p>
-                )}
+          {/* Alsó Pergamen Feladvány-kártya */}
+          <div className="pergamen-bg parchment-border p-4 z-20 rounded-t-3xl shadow-2xl border-t-4 border-[#8b4513] max-w-xl mx-auto w-full text-[#2b1a0e]">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="bg-[#8b4513] text-amber-200 text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider">
+                  {station.subtitle}
+                </span>
+                <span className="text-xs font-bold text-[#8b5a2b]">{station.badge}</span>
               </div>
-            ) : (
-              <div className="text-center py-3">
-                <div className="text-4xl mb-2 animate-bounce">🏆 🪙</div>
-                <h2 className="text-xl font-black text-amber-300 mb-1">MEGTALÁLTÁTOK A KINCSET!</h2>
-                <p className="text-xs sm:text-sm text-amber-100/90 mb-3">
-                  A Dunai aranyrögök a tiétek! Menjetek vissza a Kacsakőhöz átvenni az arany kavicsokat a ládából!
-                </p>
-                <button
-                  onClick={() => {
-                    setSolved([]);
-                    setCurrentStation(0);
-                    setShowChest(false);
-                    setFeedback("");
-                    updateMarkers(0, []);
-                  }}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl text-sm"
-                >
-                  Újraindítás
-                </button>
+              <span className="text-xs font-extrabold text-[#8b4513]">
+                {currentIdx + 1}. / {STATIONS.length} ÁLLOMÁS
+              </span>
+            </div>
+
+            <h2 className="text-base sm:text-lg font-black leading-snug mb-1 text-[#2b1a0e]">
+              {station.title}
+            </h2>
+
+            <p className="text-xs text-[#451a03] mb-2 leading-relaxed italic">
+              "{station.story}"
+            </p>
+
+            {/* A konkrét rejtvény */}
+            <div className="bg-amber-100/70 p-2.5 rounded-xl border border-[#8b5a2b]/30 mb-3 shadow-inner">
+              <div className="text-xs font-bold text-[#8b4513] mb-0.5">📜 A feladat:</div>
+              <p className="text-xs font-semibold text-[#2b1a0e]">{station.task}</p>
+              <div className="mt-1 text-[11px] text-[#8b5a2b] font-medium">
+                💡 <span className="italic">Nyom: {station.hint}</span>
+              </div>
+            </div>
+
+            {/* Megfejtés mező */}
+            <form onSubmit={handleSolve} className="flex gap-2">
+              <input
+                type="text"
+                value={inputVal}
+                onChange={(e) => setInputVal(e.target.value)}
+                placeholder="Írd be a választ / számot..."
+                className="flex-1 bg-white border-2 border-[#8b5a2b] rounded-xl px-3 py-2 text-sm text-[#2b1a0e] font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm"
+              />
+              <button
+                type="submit"
+                className="bg-[#8b4513] hover:bg-[#a0522d] active:scale-95 text-amber-100 font-extrabold px-4 py-2 rounded-xl text-sm border border-amber-300 shadow-md transition"
+              >
+                Kinyit
+              </button>
+            </form>
+
+            {/* Visszajelzés üzenet */}
+            {msg.text && (
+              <div className={`mt-2 text-xs font-bold text-center py-1 px-2 rounded-lg ${
+                msg.type === 'success' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+              }`}>
+                {msg.text}
               </div>
             )}
           </div>
+
+          {/* Kincsesláda Megnyitása Modal (Ha minden kész) */}
+          {showChestModal && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="pergamen-bg parchment-border p-6 rounded-3xl max-w-sm w-full text-center shadow-2xl relative">
+                <div className="text-6xl mb-3 animate-bounce">🪙 💎 👑</div>
+                <h3 className="text-xl font-black text-[#8b4513] mb-2 uppercase tracking-wide">
+                  Megtaláltátok a Kincset!
+                </h3>
+                <p className="text-xs sm:text-sm text-[#451a03] mb-4 leading-relaxed font-medium">
+                  Minden kalózpróbát kiálltatok! A Dunai aranyrögök és a Kacsakő aranykavicsai a tiétek!
+                </p>
+                <div className="bg-amber-100 p-3 rounded-xl border border-[#8b5a2b]/40 mb-4 text-xs font-bold text-[#8b4513]">
+                  Mutassátok be ezt a képernyőt a Kacsakő Bisztrónál az aranyrögök átvételéhez!
+                </div>
+                <button
+                  onClick={() => setShowChestModal(false)}
+                  className="w-full bg-[#8b4513] hover:bg-[#a0522d] text-amber-100 font-black py-2.5 rounded-xl text-sm border-2 border-amber-300 shadow-lg"
+                >
+                  Térkép bezárása
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
